@@ -234,6 +234,20 @@ void Widget::request_focus() {
     ((Screen *) widget)->update_focus(this);
 }
 
+void Widget::pre_draw(NVGcontext *ctx) {
+  if (m_children.empty()) return;
+  for (auto &c : m_children) {
+    c->pre_draw(ctx);
+  }
+}
+
+void Widget::pre_destruct(NVGcontext *ctx) {
+  if (m_children.empty()) return;
+  for (auto &c : m_children) {
+    c->pre_destruct(ctx);
+  }
+}
+
 void Widget::draw(NVGcontext *ctx) {
     #if defined(NANOGUI_SHOW_WIDGET_BOUNDS)
         nvgStrokeWidth(ctx, 1.0f);

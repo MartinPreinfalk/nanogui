@@ -40,14 +40,14 @@ public:
     /// Return the parent widget
     const Widget *parent() const { return m_parent; }
     /// Set the parent widget
-    void set_parent(Widget *parent) { m_parent = parent; }
+    virtual void set_parent(Widget *parent) { m_parent = parent; }
 
     /// Return the used \ref Layout generator
     Layout *layout() { return m_layout; }
     /// Return the used \ref Layout generator
     const Layout *layout() const { return m_layout.get(); }
     /// Set the used \ref Layout generator
-    void set_layout(Layout *layout) { m_layout = layout; }
+    virtual void set_layout(Layout *layout) { m_layout = layout; }
 
     /// Return the \ref Theme used to draw this widget
     Theme *theme() { return m_theme; }
@@ -59,7 +59,7 @@ public:
     /// Return the position relative to the parent widget
     const Vector2i &position() const { return m_pos; }
     /// Set the position relative to the parent widget
-    void set_position(const Vector2i &pos) { m_pos = pos; }
+    virtual void set_position(const Vector2i &pos) { m_pos = pos; }
 
     /// Return the absolute position on screen
     Vector2i absolute_position() const {
@@ -70,17 +70,17 @@ public:
     /// Return the size of the widget
     const Vector2i &size() const { return m_size; }
     /// set the size of the widget
-    void set_size(const Vector2i &size) { m_size = size; }
+    virtual void set_size(const Vector2i &size) { m_size = size; }
 
     /// Return the width of the widget
     int width() const { return m_size.x(); }
     /// Set the width of the widget
-    void set_width(int width) { m_size.x() = width; }
+    virtual void set_width(int width) { m_size.x() = width; }
 
     /// Return the height of the widget
     int height() const { return m_size.y(); }
     /// Set the height of the widget
-    void set_height(int height) { m_size.y() = height; }
+    virtual void set_height(int height) { m_size.y() = height; }
 
     /**
      * \brief Set the fixed size of this widget
@@ -91,7 +91,7 @@ public:
      * size; this is done with a call to \ref set_size or a call to \ref perform_layout()
      * in the parent widget.
      */
-    void set_fixed_size(const Vector2i &fixed_size) { m_fixed_size = fixed_size; }
+    virtual void set_fixed_size(const Vector2i &fixed_size) { m_fixed_size = fixed_size; }
 
     /// Return the fixed size (see \ref set_fixed_size())
     const Vector2i &fixed_size() const { return m_fixed_size; }
@@ -101,14 +101,14 @@ public:
     // Return the fixed height (see \ref set_fixed_size())
     int fixed_height() const { return m_fixed_size.y(); }
     /// Set the fixed width (see \ref set_fixed_size())
-    void set_fixed_width(int width) { m_fixed_size.x() = width; }
+    virtual void set_fixed_width(int width) { m_fixed_size.x() = width; }
     /// Set the fixed height (see \ref set_fixed_size())
-    void set_fixed_height(int height) { m_fixed_size.y() = height; }
+    virtual void set_fixed_height(int height) { m_fixed_size.y() = height; }
 
     /// Return whether or not the widget is currently visible (assuming all parents are visible)
     bool visible() const { return m_visible; }
     /// Set whether or not the widget is currently visible (assuming all parents are visible)
-    void set_visible(bool visible) { m_visible = visible; }
+    virtual void set_visible(bool visible) { m_visible = visible; }
 
     /// Check if this widget is currently visible, taking parent widgets into account
     bool visible_recursive() const {
@@ -174,22 +174,22 @@ public:
     /// Return whether or not this widget is currently enabled
     bool enabled() const { return m_enabled; }
     /// Set whether or not this widget is currently enabled
-    void set_enabled(bool enabled) { m_enabled = enabled; }
+    virtual void set_enabled(bool enabled) { m_enabled = enabled; }
 
     /// Return whether or not this widget is currently focused
     bool focused() const { return m_focused; }
     /// Set whether or not this widget is currently focused
-    void set_focused(bool focused) { m_focused = focused; }
+    virtual void set_focused(bool focused) { m_focused = focused; }
     /// Request the focus to be moved to this widget
     void request_focus();
 
     const std::string &tooltip() const { return m_tooltip; }
-    void set_tooltip(const std::string &tooltip) { m_tooltip = tooltip; }
+    virtual void set_tooltip(const std::string &tooltip) { m_tooltip = tooltip; }
 
     /// Return current font size. If not set the default of the current theme will be returned
     int font_size() const;
     /// Set the font size of this widget
-    void set_font_size(int font_size) { m_font_size = font_size; }
+    virtual void set_font_size(int font_size) { m_font_size = font_size; }
     /// Return whether the font size is explicitly specified for this widget
     bool has_font_size() const { return m_font_size > 0; }
 
@@ -203,12 +203,12 @@ public:
      * Sets the amount of extra scaling applied to *icon* fonts.
      * See \ref nanogui::Widget::m_icon_extra_scale.
      */
-    void set_icon_extra_scale(float scale) { m_icon_extra_scale = scale; }
+    virtual void set_icon_extra_scale(float scale) { m_icon_extra_scale = scale; }
 
     /// Return a pointer to the cursor of the widget
     Cursor cursor() const { return m_cursor; }
     /// Set the cursor of the widget
-    void set_cursor(Cursor cursor) { m_cursor = cursor; }
+    virtual void set_cursor(Cursor cursor) { m_cursor = cursor; }
 
     /// Check if the widget contains a certain position
     bool contains(const Vector2i &p) const {
@@ -250,8 +250,14 @@ public:
     /// Invoke the associated layout generator to properly place child widgets, if any
     virtual void perform_layout(NVGcontext *ctx);
 
+    /// called before draw to update internal data, eg pre-render textures
+    virtual void pre_draw(NVGcontext *ctx);
+
     /// Draw the widget (and all child widgets)
     virtual void draw(NVGcontext *ctx);
+
+    /// called before destruction but with still intact nanovg context and gl context
+    virtual void pre_destruct(NVGcontext *ctx);
 
 protected:
     /// Free all resources used by the widget and any children

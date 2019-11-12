@@ -262,4 +262,7 @@ protected:
 #endif
 };
 
+int image_from_handle(NVGcontext *ctx, unsigned int textureId, int w, int h,
+                    int flags);
+
 NAMESPACE_END(nanogui)

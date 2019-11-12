@@ -527,6 +527,11 @@ void Screen::initialize(GLFWwindow *window, bool shutdown_glfw) {
 }
 
 Screen::~Screen() {
+    try {
+      for (auto child : m_children) {
+        if (child) child->pre_destruct(m_nvg_context);
+      }
+    } catch (...) {}
     __nanogui_screens.erase(m_glfw_window);
     for (size_t i = 0; i < (size_t) Cursor::CursorCount; ++i) {
         if (m_cursors[i])
@@ -599,6 +604,8 @@ void Screen::draw_all() {
         mnvgSetColorTexture(m_nvg_context, m_metal_texture);
 #endif
 
+        pre_draw(m_nvg_context);
+
 #if !defined(EMSCRIPTEN)
         glfwGetFramebufferSize(m_glfw_window, &m_fbsize[0], &m_fbsize[1]);
         glfwGetWindowSize(m_glfw_window, &m_size[0], &m_size[1]);
@@ -619,7 +626,6 @@ void Screen::draw_all() {
 #if defined(NANOGUI_USE_OPENGL) || defined(NANOGUI_USE_GLES)
         CHK(glViewport(0, 0, m_fbsize[0], m_fbsize[1]));
 #endif
-
         draw_contents();
         draw_widgets();
 
@@ -644,6 +650,7 @@ void Screen::nvg_flush() {
 }
 
 void Screen::draw_widgets() {
+
     nvgBeginFrame(m_nvg_context, m_size[0], m_size[1], m_pixel_ratio);
 
     draw(m_nvg_context);
@@ -998,5 +1005,10 @@ void *Screen::metal_layer() const {
     return metal_window_layer(glfwGetCocoaWindow(m_glfw_window));
 }
 #endif
+
+int image_from_handle(NVGcontext *ctx, unsigned int textureId, int w, int h,
+                    int flags) {
+  return nvglCreateImageFromHandleGL3(ctx, textureId, w, h, flags);
+}
 
 NAMESPACE_END(nanogui)
