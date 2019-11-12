@@ -29,6 +29,7 @@ NAMESPACE_BEGIN(nanogui)
  */
 class NANOGUI_EXPORT PopupButton : public Button {
 public:
+    enum class AnchorType {ParentWindowAnchor = 0, WigetAnchor};
     PopupButton(Widget *parent, const std::string &caption = "Untitled",
                 int button_icon = 0);
 
@@ -41,12 +42,16 @@ public:
     Popup *popup() { return m_popup; }
     const Popup *popup() const { return m_popup; }
 
+    AnchorType anchor_type() const { return m_anchor_type; }
+    void set_anchor_type(const AnchorType &anchor_type) { m_anchor_type = anchor_type; }
+
     virtual void draw(NVGcontext* ctx) override;
     virtual Vector2i preferred_size(NVGcontext *ctx) const override;
     virtual void perform_layout(NVGcontext *ctx) override;
 protected:
     Popup *m_popup;
     int m_chevron_icon;
+    AnchorType m_anchor_type;
 };
 
 NAMESPACE_END(nanogui)

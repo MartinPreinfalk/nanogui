@@ -17,7 +17,7 @@
 NAMESPACE_BEGIN(nanogui)
 
 PopupButton::PopupButton(Widget *parent, const std::string &caption, int button_icon)
-    : Button(parent, caption, button_icon) {
+    : Button(parent, caption, button_icon), m_anchor_type(AnchorType::ParentWindowAnchor) {
 
     m_chevron_icon = m_theme->m_popup_chevron_right_icon;
 
@@ -72,10 +72,18 @@ void PopupButton::perform_layout(NVGcontext *ctx) {
 
     if (parent_window) {
         int pos_y = absolute_position().y() - parent_window->position().y() + m_size.y() / 2;
-        if (m_popup->side() == Popup::Right)
+        if (m_anchor_type == AnchorType::WigetAnchor) {
+            int posX = absolute_position().x() - parent_window->position().x();
+            if (m_popup->side() == Popup::Right)
+                m_popup->set_anchor_pos(Vector2i(posX + width() + anchor_size, pos_y));
+            else
+                m_popup->set_anchor_pos(Vector2i(posX - anchor_size, pos_y));
+        } else {
+          if (m_popup->side() == Popup::Right)
             m_popup->set_anchor_pos(Vector2i(parent_window->width() + anchor_size, pos_y));
-        else
+          else
             m_popup->set_anchor_pos(Vector2i(-anchor_size, pos_y));
+        }
     } else {
         m_popup->set_position(absolute_position() + Vector2i(width() + anchor_size + 1,  m_size.y() / 2 - anchor_size));
     }
