@@ -527,6 +527,7 @@ void Screen::initialize(GLFWwindow *window, bool shutdown_glfw) {
 }
 
 Screen::~Screen() {
+    glfwMakeContextCurrent(m_glfw_window);
     try {
       for (auto child : m_children) {
         if (child) child->pre_destruct(m_nvg_context);
